@@ -12,6 +12,7 @@
 
 **Enhancements (my next steps):**
   > Additional Filtering Criteria- Implement more sophisticated filtering based on additional criteria or sensor data analysis.
+> 
   > GUI Integration- Develop a GUI tool for visualizing and managing the filtering process.
 
 **Known Issues:**
