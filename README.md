@@ -10,7 +10,12 @@
   - Motion Detection: Includes logic to check if the vehicle is moving based on odometry data.
   - Robust Error Handling: Implements error handling for file operations to ensure smooth execution.
 
-**Enhancements (my next steps):**
+**Enhancements (What I plan to add to the Node)**: 
+  - Implement pattern recognition and SNR-based filtering (removes garbage data).
+  - Develop a radar data simulation module based on LiDAR data.
+  - Optimize the node for handling large datasets efficiently (parallel processing).
+
+**My next steps:**
   > Additional Filtering Criteria- Implement more sophisticated filtering based on additional criteria or sensor data analysis.
 > 
   > GUI Integration- Develop a GUI tool for visualizing and managing the filtering process.
