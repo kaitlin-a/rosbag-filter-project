@@ -1,4 +1,4 @@
-**rosbag_filter_project:** 
+**rosbag_filter (RBF) Project:** 
   - The rosbag_filter_project is a ROS node designed to process ROS bag files by filtering out and extracting specific sensor data topics. 
       > **This node aims to create a new ROS bag file named filtered_<original_file_name>.bag containing only the relevant data.**
   - The primary goal is to remove data when the vehicle is stationary, ensuring that only relevant data is preserved. 
