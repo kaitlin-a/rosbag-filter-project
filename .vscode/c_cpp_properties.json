@@ -1,0 +1,20 @@
+{
+    "configurations": [
+      {
+        "name": "WSL",
+        "includePath": [
+          "${workspaceFolder}/**",
+          "/opt/ros/noetic/include",
+          "/home/kaity_227141/catkin_ws/devel/include",
+          "/home/kaity_227141/catkin_ws/src"
+        ],
+        "defines": [],
+        "compilerPath": "/usr/bin/gcc",
+        "cStandard": "c11",
+        "cppStandard": "c++14",
+        "intelliSenseMode": "linux-gcc-x64"
+      }
+    ],
+    "version": 4
+  }
+  
