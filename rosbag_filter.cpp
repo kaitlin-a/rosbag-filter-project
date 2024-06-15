@@ -6,6 +6,9 @@
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/Imu.h>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 class DataFilter {
 public:
@@ -14,7 +17,7 @@ public:
         rosbag::Bag bag;
         try {
             bag.open(bag_file, rosbag::bagmode::Read);
-            std::cout << "Bag file opened successfully." << bag_file << std::endl;
+            std::cout << "Bag file opened successfully." << std::endl;
         } catch (const rosbag::BagIOException& e) {
             ROS_ERROR("Error opening bag file: %s", bag_file.c_str());
             std::cerr << "Exception: " << e.what() << std::endl;
@@ -26,11 +29,14 @@ public:
         rosbag::View view(bag, rosbag::TopicQuery(topics));
 
 
-        std::string filtered_bag_path = "filtered_" + bag_file;
+        fs::path original_path(bag_file);
+        fs::path filtered_bag_path = original_path.parent_path() / ("filtered_" + orginal_path.filename().string());
+
         std::cout << "Creating filtered bag file: " << filtered_bag_path << std::endl;
         rosbag::Bag filtered_bag;
+        
         try {
-        filtered_bag.open(filtered_bag_path, rosbag::bagmode::Write);
+        filtered_bag.open(filtered_bag_path.string(), rosbag::bagmode::Write);
         std::cout << "Filtered bag file opened successfully: " << filtered_bag_path << std::endl;
         } catch (const rosbag::BagIOException& e) {
             ROS_ERROR("Error opening filtered bag file: %s", filtered_bag_path.c_str());
@@ -38,29 +44,32 @@ public:
             return;
         }
 
+        nav_msgs::Odometry::ConstrPtr last_odom;
+
         for (const rosbag::MessageInstance &m : view) {
             if (m.getTopic() == "/odom") {
                 nav_msgs::Odometry::ConstPtr odom = m.instantiate<nav_msgs::Odometry>();
 
                 if (odom != nullptr && isVehicleMoving(odom)) {
                     filtered_bag.write("/odom", m.getTime(), odom);
+                    last_odom = odom;
                 }
 
             } else if (m.getTopic() == "/scan") {
                 sensor_msgs::LaserScan::ConstPtr scan = m.instantiate<sensor_msgs::LaserScan>();
-                if (scan != nullptr) {
+                if (scan != nullptr && last_odom != nullptr && isVehicleMoving(last_odom)) {
                     filtered_bag.write("/scan", m.getTime(), scan);
                 }
 
             } else if (m.getTopic() == "/camera") {
                 sensor_msgs::Image::ConstPtr img = m.instantiate<sensor_msgs::Image>();
-                if (img != nullptr) {
+                if (img != nullptr && last_odom != nullptr && isVehicleMoving(last_odom)) {
                     filtered_bag.write("/camera", m.getTime(), img);
                 }
             
             } else if (m.getTopic() == "/imu/data") {
                 sensor_msgs::Imu::ConstPtr imu = m.instantiate<sensor_msgs::Imu>();
-                if (imu != nullptr) {
+                if (imu != nullptr && last_odom != nullptr && isVehicleMoving(last_odom)) {
                     filtered_bag.write("/imu/data", m.getTime(), imu);
                 }
             }
@@ -73,13 +82,14 @@ public:
 
 private:
     bool isVehicleMoving(const nav_msgs::Odometry::ConstPtr& odom) {
-        return odom->twist.twist.linear.x != 0.0 || 
-               odom->twist.twist.linear.y != 0.0 || 
-               odom->twist.twist.linear.z != 0.0 ||
+        double threshold = 0.01; //Possible adjustment later ? 
+        return  std::abs(odom->twist.twist.linear.x) > threshold ||
+                std::abs(odom->twist.twist.linear.y) > threshold ||
+                std::abs(odom->twist.twist.linear.z) > threshold || 
+                std::abs(odom->twist.twist.angular.x) > threshold ||
+                std::abs(odom->twist.twist.angular.y) > threshold ||
+                std::abs(odom->twist.twist.angular.z) > threshold;
 
-               odom->twist.twist.angular.x != 0.0 || 
-               odom->twist.twist.angular.y != 0.0 || 
-               odom->twist.twist.angular.z != 0.0;
     }
 };
 

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(rosbag_filter)
 
+set(CMAKE_CXX_STANDARD 17)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rosbag
