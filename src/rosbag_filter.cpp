@@ -124,9 +124,12 @@ void DataFilter::filterData(const std::string& bag_file, double start_time, doub
     }
 
     for (const rosbag::MessageInstance &m : view) {
-        if (m.getTime().toSec() < start_time || m.getTime().toSec() > end_time) {
-            continue;
-        }
+    std::cout << "Processing message from topic: " << m.getTopic() << " at time: " << m.getTime().toSec() << std::endl;
+
+    if (m.getTime().toSec() < start_time || m.getTime().toSec() > end_time) {
+        std::cout << "Skipping message outside time range" << std::endl;
+        continue;
+    }
 
         if (m.getTopic() == "/odom") {
             nav_msgs::Odometry::ConstPtr odom = m.instantiate<nav_msgs::Odometry>();
@@ -166,6 +169,8 @@ void DataFilter::filterData(const std::string& bag_file, double start_time, doub
                 filtered_bag.write(m.getTopic(), m.getTime(), pc2);
                 pc2_pub_.publish(pc2);
             }
+        } else {
+        std::cout << "Skipping unsupported topic: " << m.getTopic() << std::endl;
         }
     }
 
