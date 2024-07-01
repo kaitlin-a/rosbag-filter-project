@@ -124,12 +124,12 @@ void DataFilter::filterData(const std::string& bag_file, double start_time, doub
     }
 
     for (const rosbag::MessageInstance &m : view) {
-    std::cout << "Processing message from topic: " << m.getTopic() << " at time: " << m.getTime().toSec() << std::endl;
+        std::cout << "Processing message from topic: " << m.getTopic() << " at time: " << m.getTime().toSec() << std::endl;
 
-    if (m.getTime().toSec() < start_time || m.getTime().toSec() > end_time) {
-        std::cout << "Skipping message outside time range" << std::endl;
-        continue;
-    }
+        if (m.getTime().toSec() < start_time || m.getTime().toSec() > end_time) {
+            std::cout << "Skipping message outside time range" << std::endl;
+            continue;
+        }
 
         if (m.getTopic() == "/odom") {
             nav_msgs::Odometry::ConstPtr odom = m.instantiate<nav_msgs::Odometry>();
@@ -170,7 +170,7 @@ void DataFilter::filterData(const std::string& bag_file, double start_time, doub
                 pc2_pub_.publish(pc2);
             }
         } else {
-        std::cout << "Skipping unsupported topic: " << m.getTopic() << std::endl;
+            std::cout << "Skipping unsupported topic: " << m.getTopic() << std::endl;
         }
     }
 
@@ -239,20 +239,7 @@ int main(int argc, char** argv) {
     }
     bag.close();
 
-    // Print available topics, ask user for selection
-    std::cout << "Available topics in the bag file:" << std::endl;
-    for (const auto& topic : available_topics) {
-        std::cout << topic << std::endl;
-    }
-
-    std::cout << "Please enter the topics provided above that you want to include, separated by spaces (e.g., /odom /scan /imu/data): ";
-    std::string input_topics;
-    std::getline(std::cin, input_topics);
-
-    std::istringstream iss(input_topics);
-    std::set<std::string> topics((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
-
-    // Ensure that we include essential topics by default
+    // Hardcoded essential topics
     std::set<std::string> essential_topics = {
         "/odom", 
         "/scan", 
@@ -260,7 +247,30 @@ int main(int argc, char** argv) {
         "/imu/data", 
         "/lidar_left/velodyne_points", 
         "/lidar_right/velodyne_points"
-        };
+    };
+
+    // Filter out essential topics from available topics for user selection
+    std::set<std::string> user_selectable_topics;
+    for (const auto& topic : available_topics) {
+        if (essential_topics.find(topic) == essential_topics.end()) {
+            user_selectable_topics.insert(topic);
+        }
+    }
+
+    // Print available topics for user selection
+    std::cout << "Available topics in the bag file:" << std::endl;
+    for (const auto& topic : user_selectable_topics) {
+        std::cout << topic << std::endl;
+    }
+
+    std::cout << "Please enter the topics provided above that you want to include, separated by spaces: ";
+    std::string input_topics;
+    std::getline(std::cin, input_topics);
+
+    std::istringstream iss(input_topics);
+    std::set<std::string> topics((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+
+    // Add essential topics to the selected topics
     for (const auto& topic : essential_topics) {
         if (available_topics.find(topic) != available_topics.end()) {
             topics.insert(topic);
