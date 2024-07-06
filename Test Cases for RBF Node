@@ -1,0 +1,117 @@
+## TC01
+**Title**: Bag_01: Verify ROSbag filtering by time range
+**Description**: Ensure the ROSbag Filtration Node correctly filters messages within the specified time range.
+**Preconditions**: 
+- A ROSbag file named `bag_01.bag` is available in the `catkin_ws/bags/` directory.
+- ROS environment is set up and sourced.
+
+**Steps**:
+1. Run the command: `rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 10 --end_time 20 --bag_file ~/catkin_ws/bags/bag_01.bag --topics "/imu/data /front_camera/image_raw"`
+2. Confirm output message "Filtered bag file created and closed successfully."
+3. Run: `rosbag info ~/catkin_ws/bags/filtered_bag_01.bag`
+4. Verify the filtered bag info includes only the specified topics within the time range.
+5. Run: `rosbag play ~/catkin_ws/bags/filtered_bag_01.bag` and verify that the messages play correctly.
+
+**Expected Result**: 
+- The node filters messages from /imu/data and /front_camera/image_raw within the 10s to 20s range, creating a new filtered bag file.
+- rosbag info on the filtered bag shows accurate metadata.
+- rosbag play replays the messages correctly.
+
+
+**Actual Result**: The node processed and filtered messages correctly. The filtered bag file was created successfully, containing only the specified topics within the time range.
+
+**Status**: Pass
+**Notes**: ['rosbag info' output:
+Path: /home/kaity_227141/catkin_ws/bags/filtered_bag_01.bag
+Version: 2.0
+Duration: 10.0s
+Start: Jun 15 2020 10:49:41.66 (1592236181.66)
+End: Jun 15 2020 10:49:51.64 (1592236191.64)
+Size: 400.2 MB
+Messages: 600
+Types: sensor_msgs/Image, sensor_msgs/Imu
+Topics: /front_camera/image_raw (100 msgs), /imu/data (500 msgs)
+rosbag play replayed the messages correctly.]
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+## TC02
+**Title**: Verify ROSbag filtering by time range for bag_02.bag  
+**Description**: This test case verifies that the ROSbag Filtration Node correctly filters messages within the specified time range for the `bag_02.bag` file.  
+**Preconditions**: 
+- A ROSbag file named `bag_02.bag` is available in the `catkin_ws/bags/` directory.
+- ROS environment is set up and sourced.
+
+**Steps**:
+1. Run the command: `rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 10 --end_time 20 --bag_file ~/catkin_ws/bags/bag_02.bag --topics "/imu/data /front_camera/image_raw"`
+2. Check the output for the message "Filtered bag file created and closed successfully."
+3. Run the command: `rosbag info ~/catkin_ws/bags/filtered_bag_02.bag`
+4. Verify the filtered bag info includes only messages from the specified topics and within the specified time range.
+5. Run the command: `rosbag play ~/catkin_ws/bags/filtered_bag_02.bag` and verify that the messages play correctly.
+
+**Expected Result**: 
+- The node should filter messages from the specified topics (/imu/data and /front_camera/image_raw) within the time range (10s to 20s) and create a new filtered bag file.
+- The filtered bag file should contain only the specified topics with messages within the defined time range.
+- `rosbag info` on the filtered bag should display the correct metadata, including topics, message types, and counts.
+- `rosbag play` should replay the messages correctly from the filtered bag.
+
+**Actual Result**: 
+- The node processed messages from the specified topics within the defined time range, as indicated by the terminal output:
+rocessing message from topic: /imu/data at time: ...
+Writing message from topic: /imu/data at time: ...
+Processing message from topic: /front_camera/image_raw at time: ...
+Writing message from topic: /front_camera/image_raw at time: ...
+- `rosbag play` replayed the messages correctly, as shown by the terminal output.
+
+**Status**: Pass  
+**Notes**: None
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+## TC03
+**Title**: Verify ROSbag filtering by time range for bag_03.bag  
+**Description**: This test case verifies that the ROSbag Filtration Node correctly filters messages within the specified time range for the `bag_03.bag` file.  
+**Preconditions**: 
+- A ROSbag file named `bag_03.bag` is available in the `catkin_ws/bags/` directory.
+- ROS environment is set up and sourced.
+
+**Steps**:
+1. Run the command: `rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 10 --end_time 20 --bag_file ~/catkin_ws/bags/bag_03.bag --topics "/imu/data /front_camera/image_raw"`
+2. Check the output for the message "Filtered bag file created and closed successfully."
+3. Run the command: `rosbag info ~/catkin_ws/bags/filtered_bag_03.bag`
+4. Verify the filtered bag info includes only messages from the specified topics and within the specified time range.
+5. Run the command: `rosbag play ~/catkin_ws/bags/filtered_bag_03.bag` and verify that the messages play correctly.
+
+**Expected Result**: 
+- The node should filter messages from the specified topics (/imu/data and /front_camera/image_raw) within the time range (10s to 20s) and create a new filtered bag file.
+- The filtered bag file should contain only the specified topics with messages within the defined time range.
+- `rosbag info` on the filtered bag should display the correct metadata, including topics, message types, and counts.
+- `rosbag play` should replay the messages correctly from the filtered bag.
+
+**Actual Result**: 
+- The node processed messages from the specified topics within the defined time range, as indicated by the terminal output:
+- The filtered bag file was created and closed successfully.
+- `rosbag info` displayed the accurate metadata for the filtered bag
+
+- `rosbag play` replayed the messages correctly, as shown by the terminal output.
+
+**Status**: Pass  
+**Notes**: None
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## TC04: Verify ROSbag filtering by time range and different topics on bag_01.bag
+
+**Title**: Verify ROSbag filtering by time range and different topics on bag_01.bag
+
+**Description**: This test case verifies that the ROSbag Filtration Node correctly filters messages from the specified topics within the time range of 0 to 30 seconds in the `bag_01.bag`.
+
+**Preconditions**:
+- A ROSbag file named `bag_01.bag` is available in the `catkin_ws/bags/` directory.
+- ROS environment is set up and sourced.
+
+**Actual Result**: 
+- The node processed messages from the specified topics within the defined time range, as indicated by the terminal output:
+- The filtered bag file was created and closed successfully.
+
+**Status**: Pass  
+**Notes**: None
