@@ -4,8 +4,11 @@ rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 10 --end
 **Running a folder of bag files:** 
 rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 10 --end_time 20 --bag_folder ~/catkin_ws/bags --topics "/imu/data /front_camera/image_raw"
 
-**Full bag duration:** //Simply delete start and end time from specifications: 
+**Full bag duration for one file:** //Simply delete start and end time from specifications: 
 rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --bag_file ~/catkin_ws/bags/bag_01.bag --topics "/imu/data /front_camera/image_raw"
+
+**Full duration for folder of bag files:** 
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --bag_folder ~/catkin_ws/bags --topics "/imu/data /front_camera/image_raw"
 
 **For specification on topic list:** //Change path to your relative path
 rosbag info ~/catkin_ws/bags/filtered_bag_01.bag 
