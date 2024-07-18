@@ -1,0 +1,26 @@
+**Running a single bag file:** //Change path provided to your relative path
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 10 --end_time 20 --bag_file ~/catkin_ws/bags/bag_01.bag --topics "/imu/data /front_camera/image_raw"
+
+**Running a folder of bag files:** 
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 10 --end_time 20 --bag_folder ~/catkin_ws/bags --topics "/imu/data /front_camera/image_raw"
+
+**Full bag duration for one file:** //Simply delete start and end time from specifications: 
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --bag_file ~/catkin_ws/bags/bag_01.bag --topics "/imu/data /front_camera/image_raw"
+
+**Full duration for folder of bag files:** 
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --bag_folder ~/catkin_ws/bags --topics "/imu/data /front_camera/image_raw"
+
+**For specification on topic list:** //Change path to your relative path
+rosbag info ~/catkin_ws/bags/filtered_bag_01.bag 
+
+**To Run all topics:**
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 10 --end_time 20 --bag_file ~/catkin_ws/bags/bag_01.bag --topics "/imu/data /front_camera/image_raw /navsat/odom /radar/radar_image_far"
+
+
+
+Summary of Parameters
+--ros_version: Specifies the ROS version (ros1 or ros2).
+--start_time: The start time for filtering (in seconds).
+--end_time: The end time for filtering (in seconds).
+--bag_file: The path to the ROS bag file.
+--topics: The topics to include in the filtered bag, separated by spaces.
