@@ -77,6 +77,19 @@ public:
         P_ = (Eigen::MatrixXd::Identity(6, 6) - K * H_) * P_; // Update state estimate & covariance
     }
 
+    double calculateSNR(const Eigen::VectorXd& signal, const Eigen::VectorXd& noise) {
+        double signal_power = signal.squaredNorm() / signal.size();
+        double noise_power = noise.squaredNorm() / noise.size();
+        return 10 * log10(signal_power / noise_power);
+    }
+
+    void adjustMeasurementNoise(const Eigen::VectorXd& z) {
+        Eigen::VectorXd noise = z - H_ * x_;
+        double snr = calculateSNR(z, noise);
+        double scaling_factor = (snr < 10) ? 10 : (snr > 30) ? 0.1 : 1.0 / snr;
+        R_ *= scaling_factor;
+    }
+
     Eigen::VectorXd getState() const {
         return x_;
     }
@@ -91,6 +104,7 @@ void filterOdometry(const nav_msgs::Odometry::ConstPtr& odom_msg, KalmanFilter& 
     // Convert odometry data to Eigen vector for updating the Kalman filter
     Eigen::VectorXd z(3);
     z << odom_msg->pose.pose.position.x, odom_msg->pose.pose.position.y, odom_msg->pose.pose.position.z;
+    kf.adjustMeasurementNoise(z); // Adjust measurement noise based on SNR
     kf.update(z);
 }
 
@@ -178,7 +192,7 @@ int main(int argc, char** argv) {
         ("bag_folder", po::value<std::string>(), "Path to the folder containing rosbag files")
         ("topics", po::value<std::string>()->required(), "Topics to include, separated by spaces");
 
-    po::variables_map vm;
+        po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
 
     if (vm.count("help")) {
