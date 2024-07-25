@@ -44,10 +44,8 @@ public:
         Q_ *= 0.1; // TBD, double check expected process noise
 
         // Measurement matrix
-        H_ = Eigen::MatrixXd(3, 6);
-        H_ << 1, 0, 0, 0, 0, 0,
-              0, 1, 0, 0, 0, 0,
-              0, 0, 1, 0, 0, 0;
+        H_ = Eigen::MatrixXd(6, 6);
+        H_.setIdentity();
 
         // Measurement noise covariance matrix
         R_ = Eigen::MatrixXd(3, 3);
@@ -64,7 +62,7 @@ public:
 
     void update(const Eigen::VectorXd& z) { // Update step
         if (!initialized_) {
-            x_.head(3) = z;
+            x_.head(3) = z.head(3); // Initialize the position part of the state vector
             initialized_ = true;
             return;
         }
@@ -94,6 +92,10 @@ public:
         return x_;
     }
 
+    bool isMoving(double threshold = 0.1) const {
+        return x_.tail(3).norm() > threshold;
+    }
+
 private:
     Eigen::VectorXd x_;
     Eigen::MatrixXd P_, F_, Q_, H_, R_;
@@ -120,22 +122,29 @@ void filterData(rosbag::Bag& input_bag, rosbag::Bag& output_bag, const std::set<
             continue;
         }
 
-        if (m.getTopic() == "/odom") {
+        if (m.getDataType() == "nav_msgs/Odometry") {
             nav_msgs::Odometry::ConstPtr odom = m.instantiate<nav_msgs::Odometry>();
             if (odom != nullptr) {
-                filterOdometry(odom, kf);
-                std::cout << "Writing /odom message at time: " << m.getTime().toSec() << std::endl;
-                output_bag.write("/odom", m.getTime(), odom);
+                Eigen::VectorXd z(6);
+                z << odom->pose.pose.position.x, odom->pose.pose.position.y, odom->pose.pose.position.z,
+                     odom->twist.twist.linear.x, odom->twist.twist.linear.y, odom->twist.twist.linear.z;
+                kf.adjustMeasurementNoise(z); // Adjust measurement noise based on SNR
+                kf.update(z);
+                if (kf.isMoving()) {
+                    std::cout << "Writing /odom message at time: " << m.getTime().toSec() << std::endl;
+                    output_bag.write(m.getTopic(), m.getTime(), odom);
+                }
                 last_odom = odom;
             }
-        } else if (m.getTopic() == "/imu/data") {
+        } else if (m.getDataType() == "sensor_msgs/Imu") {
             sensor_msgs::Imu::ConstPtr imu = m.instantiate<sensor_msgs::Imu>();
             if (imu != nullptr && last_odom != nullptr) {
                 std::cout << "Writing /imu/data message at time: " << m.getTime().toSec() << std::endl;
-                output_bag.write("/imu/data", m.getTime(), imu);
+                output_bag.write(m.getTopic(), m.getTime(), imu);
             }
         } else {
-            std::cout << "Skipping unsupported topic: " << m.getTopic() << std::endl;
+            std::cout << "Writing unsupported topic: " << m.getTopic() << std::endl;
+            output_bag.write(m.getTopic(), m.getTime(), m);
         }
     }
 
