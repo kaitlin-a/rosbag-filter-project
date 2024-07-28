@@ -115,3 +115,56 @@ Writing message from topic: /front_camera/image_raw at time: ...
 
 **Status**: Pass  
 **Notes**: None
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+TC05: Verify behavior with a very large Rosbag file
+Command:
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 10 --end_time 20 --bag_file /home/kaity_227141/catkin_ws/bags/large_bag.bag --topics "/imu/data /front_camera/image_raw"
+
+NOT TESTED YET 
+
+TC06: Verify behavior with non-existent topics
+Command:
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 10 --end_time 20 --bag_file /home/kaity_227141/catkin_ws/bags/bag_02.bag --topics "/non_existent_topic /another_fake_topic"
+
+PASS
+
+
+
+TC08: Measure performance with increasing sizes of Rosbag file
+Command (for different bag sizes):
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 0 --end_time 30 --bag_file /home/kaity_227141/catkin_ws/bags/small_bag.bag --topics "/imu/data /front_camera/image_raw"
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 0 --end_time 30 --bag_file /home/kaity_227141/catkin_ws/bags/medium_bag.bag --topics "/imu/data /front_camera/image_raw"
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 0 --end_time 30 --bag_file /home/kaity_227141/catkin_ws/bags/large_bag.bag --topics "/imu/data /front_camera/image_raw"
+
+NOT YET TESTED
+
+TC09: Measure performance with increasing numbers of topics
+Command (with increasing topics):
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 0 --end_time 30 --bag_file /home/kaity_227141/catkin_ws/bags/bag_03.bag --topics "/imu/data"
+
+PASS 
+
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 0 --end_time 30 --bag_file /home/kaity_227141/catkin_ws/bags/bag_03.bag --topics "/imu/data /front_camera/image_raw"
+
+PASS
+
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 0 --end_time 30 --bag_file /home/kaity_227141/catkin_ws/bags/bag_03.bag --topics "/imu/data /front_camera/image_raw /odom"
+
+PASS
+
+TC10: Verify error messages for invalid input (e.g., invalid time range)
+Command (with invalid time range):
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time -10 --end_time 20 --bag_file /home/kaity_227141/catkin_ws/bags/bag_03.bag --topics "/imu/data /front_camera/image_raw"
+
+PASSED : Message: -error' what(): Time cannot be negative. Aborted. 
+
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 10 --end_time 5 --bag_file /home/kaity_227141/catkin_ws/bags/bag_03.bag --topics "/imu/data /front_camera/image_raw"
+
+FAILED: Filtered bag file created and closed successfully, despite the start and end time flipped. 
+
+
+TC11: Verify error handling for corrupted Rosbag files
+Command (with corrupted bag file):
+rosrun rosbag_filter rosbag_filter_node --ros_version ros1 --start_time 0 --end_time 30 --bag_file /home/kaity_227141/catkin_ws/bags/corrupted_bag.bag --topics "/imu/data /front_camera/image_raw"
+
+PASSED: Error opening bag file: Error opening file: home/kaity_227141/catkin_ws/bags/corrupted_bag.bag
